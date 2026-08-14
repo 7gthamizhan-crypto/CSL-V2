@@ -1,0 +1,1194 @@
+CORE ENGINE
+AI-Assisted Customs Examination Platform
+Detailed Functional, UI/UX, Data & Demo Implementation Specification
+This document is a complete hand-off specification for a junior developer. It defines what to build, how every new page connects to the current CORE Engine, the exact KPI/visual/table headings, data fields, interactions, demo logic, database additions, API structure, implementation order and acceptance criteria.
+1. Executive Summary
+The existing CORE Engine already handles container registration, transparent cargo risk scoring, readiness validation, resource availability and conflict-free examination scheduling. The expansion should preserve that operational core and add intelligence before scheduling and learning/governance after examination.
+Target story: Container/CusDec Data → Document Intelligence → HS Code Intelligence → Fraud & Anomaly Detection → AI Risk Intelligence → Human Recommendation Review → Readiness → CORE Optimizer → Examination → Outcome → Audit & Analytics.
+The Asia-Pacific report is regional rather than a Sri Lanka-specific specification. Therefore, this design applies its themes—risk/fraud detection, document processing, AI-ready data and human-supervised governance—to the existing CORE Engine as a proposed demo architecture.
+2. Final Navigation Structure
+Group
+Page
+Work
+Overview
+Operations Dashboard
+Upgrade
+Intelligence
+AI Recommendation Center
+NEW
+Intelligence
+AI Risk Intelligence
+NEW / Upgrade Risk Engine
+Intelligence
+Fraud & Anomaly Detection
+NEW
+Intelligence
+Document Intelligence
+NEW
+Intelligence
+HS Code Intelligence
+NEW
+Operations
+Enhanced Readiness Validation
+Upgrade
+Operations
+Examination Schedule & Optimizer
+Upgrade
+Operations
+Container Management
+Retain + add tabs
+Operations
+Resource Management
+Retain
+Operations
+Examination Outcome
+NEW
+Planning
+Scenario Simulator
+Upgrade
+Governance
+Data Quality & AI Readiness
+NEW
+Governance
+AI Governance & Audit
+NEW
+Analytics
+Reports & Analytics
+Upgrade
+Admin
+System Settings
+Upgrade
+3. Common Design Rules
+Use one shared synthetic dataset across every page; never hard-code unrelated page values.
+Use Container Number and CusDec Number as the main cross-page identifiers.
+Risk/status colours must be consistent: Critical red, High orange, Medium yellow, Low green.
+Every AI-style recommendation must show reasons/evidence and a human action.
+Use wording such as Recommended Action, Possible Anomaly, Needs Review. Do not display unverified alerts as confirmed fraud.
+Global filters where relevant: Date, Risk Level, Status, Importer, HS Code, Country of Origin, Inspection Type.
+Clearly mark simulated/sample values. Do not present invented data as official Sri Lanka Customs statistics.
+4. Page 1 – Operations Dashboard (UPGRADE)
+Purpose
+Create a single management landing page combining operational workload with intelligence-review status.
+Impact on the Current CORE Engine
+Management can see the entire container pipeline and jump directly to risk, review, readiness, scheduling or resource problems.
+Top KPI Cards
+Heading
+Definition / Value
+Action
+Total Containers
+All active containers
+Open Container Management
+Critical / High Risk
+Critical + High count
+Open Risk page
+AI Review Required
+Unresolved intelligence reviews
+Open Recommendation Center
+Ready for Scheduling
+Eligible unscheduled
+Open Readiness
+Scheduled Today
+Selected-date scheduled count
+Open Schedule
+Blocked
+Failed mandatory readiness
+Open Blocked
+Officer Utilization
+Assigned / available officer minutes
+Open Resources
+Bay Utilization
+Occupied / available bay minutes
+Open Resources
+Required Visuals
+Visual Heading
+Type
+Purpose
+Data / Axes
+Container Pipeline
+Funnel
+Received → Checked → Ready → Scheduled → Completed
+stage, count
+Risk Distribution
+Donut
+Critical/High/Medium/Low
+risk_level, count
+AI Review Reasons
+Horizontal Bar
+Top unresolved review reasons
+reason, count
+Daily Capacity
+Gauge
+Used vs available inspection minutes
+used_minutes, capacity_minutes
+Officer Workload
+Bar
+Workload by officer
+officer_name, assigned_minutes
+Bay Utilization
+Bar
+Bay occupancy
+bay_name, utilization_pct
+7-Day Workload
+Line
+Arrived/Scheduled/Completed trend
+date, counts
+Main Table – Exact Headings
+Container | CusDec | Importer | Risk | Anomaly Alerts | Document Status | Readiness | Recommended Action | Scheduled Time
+Required User Actions
+Click KPI to drill to filtered page.
+Click container to open shared Container Intelligence drawer.
+Run Optimizer button shows preview first.
+Review AI Alerts opens unresolved recommendation queue.
+Demo / Business Logic
+All dashboard counts come from shared records.
+KPI counts must reconcile with tables.
+Use sample data only.
+Required Data Fields
+Field
+Use
+risk_level
+Risk cards/charts
+review_required
+AI review card
+readiness_status
+Readiness
+schedule_status
+Schedule
+officer_id
+Workload
+bay_id
+Bay utilization
+arrival_date
+Trend
+Acceptance Criteria
+All KPIs populated.
+Drill-through works.
+Counts reconcile.
+5. Page 2 – AI Recommendation Center (NEW)
+Purpose
+Create a human-supervised work queue that converts risk, anomaly, document, HS and capacity signals into clear recommended actions.
+Impact on the Current CORE Engine
+This becomes the control tower between intelligence modules and operational execution.
+Top KPI Cards
+Heading
+Definition / Value
+Action
+Open Recommendations
+Unresolved count
+Filter Open
+Critical Recommendations
+Critical severity
+Filter Critical
+Awaiting Officer Review
+No human decision
+Filter
+Accepted Today
+Accepted today
+Filter
+Overridden Today
+Overridden today
+Filter
+Required Visuals
+Visual Heading
+Type
+Purpose
+Data / Axes
+Recommendations by Type
+Donut
+Risk/Fraud/Document/HS/Capacity
+type, count
+Severity Distribution
+Bar
+Critical/High/Medium/Low
+severity, count
+Generated vs Resolved
+Line
+Daily workflow
+date, generated, resolved
+Top Trigger Reasons
+Bar
+Most frequent evidence reasons
+reason_code, count
+Main Table – Exact Headings
+Recommendation ID | Time | Container | Type | Severity | Recommended Action | Primary Reason | Confidence | Status | Reviewer | Action
+Required User Actions
+Open recommendation to see evidence.
+Accept recommendation.
+Override with mandatory reason.
+Mark Needs Further Review.
+Send accepted operational recommendation to readiness/scheduling where applicable.
+Demo / Business Logic
+Every recommendation has at least one evidence reason.
+System recommendation and human decision are separate records.
+Never treat recommendation as an automatic legal decision.
+Required Data Fields
+Field
+Use
+recommendation_id
+Audit key
+source_module
+Origin
+severity
+Priority
+recommended_action
+Suggested action
+reason_text
+Explainability
+confidence_score
+Demo indicator
+review_status
+Open/Accepted/Overridden
+override_reason
+Mandatory on override
+Acceptance Criteria
+Every recommendation is explainable.
+Accept/override persists.
+Override requires reason.
+6. Page 3 – AI Risk Intelligence (NEW / UPGRADE)
+Purpose
+Retain the current transparent HS, country, CIF and importer-history scoring and present it as an explainable ranked risk-intelligence page. Optional anomaly/document adjustments must remain separately visible.
+Impact on the Current CORE Engine
+Feeds a stronger inspection priority into the existing optimizer while preserving transparency.
+Top KPI Cards
+Heading
+Definition / Value
+Action
+Critical Risk
+80–100
+Filter
+High Risk
+60–79
+Filter
+Average Risk Score
+Mean active score
+None
+High Risk Ready
+High/Critical + Ready
+Send to schedule
+High Risk Blocked
+High/Critical + Blocked
+Open readiness
+Required Visuals
+Visual Heading
+Type
+Purpose
+Data / Axes
+Risk Distribution
+Donut
+Risk bands
+risk_level, count
+Factor Contribution
+Stacked Bar
+Points by factor
+container, factor_points
+Risk Trend
+Line
+Average risk over time
+date, avg_score
+Top Risk HS Codes
+Bar
+Highest-risk HS groups
+hs_code, avg_score
+Top Risk Importers
+Bar
+Highest-risk demo importers
+importer, avg_score
+Main Table – Exact Headings
+Rank | Container | CusDec | Importer | HS Code | Country | CIF | HS Risk | Country Risk | Value Risk | History Risk | Anomaly Adj. | Document Adj. | Final Score | Risk Level | Recommended Action
+Required User Actions
+Click row → Why This Score panel.
+Send selected high-risk Ready container to scheduling.
+Open related anomalies/documents.
+Demo / Business Logic
+Final score remains 0–100.
+Base score is transparent.
+Optional adjustments are separately labelled.
+Critical/High/Medium/Low thresholds remain configurable.
+Required Data Fields
+Field
+Use
+hs_risk_points
+Commodity risk
+country_risk_points
+Origin contribution
+value_risk_points
+CIF contribution
+history_risk_points
+Importer history
+anomaly_adjustment
+Optional signal
+document_adjustment
+Optional signal
+final_risk_score
+0–100
+recommended_action
+Suggested inspection action
+Acceptance Criteria
+Breakdown sums correctly.
+No unexplained score.
+Risk reason visible from schedule.
+7. Page 4 – Fraud & Anomaly Detection (NEW)
+Purpose
+Detect unusual declarations using transparent sample rules. The page must say possible anomaly, not confirmed fraud.
+Impact on the Current CORE Engine
+Adds dynamic targeting signals beyond static risk scoring and can trigger human review or increase inspection priority.
+Top KPI Cards
+Heading
+Definition / Value
+Action
+Containers Screened
+Processed count
+Open all
+Alerts Detected
+Open alerts
+Filter
+High-Severity Alerts
+High/Critical
+Filter
+CIF Anomalies
+Value alerts
+Filter
+Importer Pattern Alerts
+Importer/history alerts
+Filter
+Required Visuals
+Visual Heading
+Type
+Purpose
+Data / Axes
+Anomalies by Type
+Donut
+CIF/Quantity/Importer/Route/HS/Document
+type, count
+Severity Distribution
+Bar
+Alert severity
+severity, count
+Declared vs Reference CIF
+Scatter
+Outlier view
+reference_cif, declared_cif
+Alerts Over Time
+Line
+Daily alerts
+date, count
+Top Alerted HS Codes
+Bar
+Alert concentration
+hs_code, count
+Main Table – Exact Headings
+Alert ID | Container | CusDec | Alert Type | Severity | Observed Value | Reference Value | Variance % | Reason | Status | Recommended Action
+Required User Actions
+Open evidence panel.
+Disposition: False Positive / Valid Concern / Needs Review.
+Send to Recommendation Center.
+Link to container detail.
+Demo / Business Logic
+Demo rules may include unusually low CIF vs synthetic peer reference, repeated offences, unusual HS-country combination, declaration/document mismatch.
+Store rule code and reason.
+Do not call alert proven fraud.
+Required Data Fields
+Field
+Use
+anomaly_type
+Alert category
+observed_value
+Current value
+reference_value
+Synthetic comparison
+variance_pct
+Difference
+severity
+Priority
+rule_code
+Trigger
+reason_text
+Evidence
+disposition
+Human review result
+Acceptance Criteria
+Every alert shows evidence.
+Disposition persists.
+No confirmed-fraud wording before outcome.
+8. Page 5 – Document Intelligence (NEW)
+Purpose
+Extend the current complete/incomplete document check into a field-level verification and review page. Use simulated extraction for the demo; real OCR is a future integration.
+Impact on the Current CORE Engine
+Improves readiness quality and provides a visible document-review queue before scheduling.
+Top KPI Cards
+Heading
+Definition / Value
+Action
+Documents Checked
+Processed documents
+Open
+Verified
+Passed
+Filter
+Needs Review
+Issues
+Filter
+Missing
+Required absent
+Filter
+Average Confidence
+Mean demo confidence
+None
+Required Visuals
+Visual Heading
+Type
+Purpose
+Data / Axes
+Document Status
+Donut
+Verified/Review/Missing
+status, count
+Issues by Type
+Bar
+Mismatch/missing/expired
+issue_type, count
+Confidence Bands
+Bar
+High/Medium/Low
+band, count
+Review Backlog
+Line
+Open reviews over time
+date, open_count
+Main Table – Exact Headings
+Container | CusDec | Document Type | Document Ref | Extraction Status | Confidence | Checks Passed | Issues | Status | Reviewer
+Required User Actions
+Open document field comparison.
+Verify / Reject / Needs Review.
+Missing/rejected mandatory document updates readiness.
+Send mismatch to Recommendation Center.
+Demo / Business Logic
+Store mock extracted fields initially.
+Compare invoice CIF, quantity, importer, HS and permit data against declaration record.
+Always show compared values; confidence alone is insufficient.
+Required Data Fields
+Field
+Use
+document_type
+Invoice/Packing List/Bill of Lading/Permit
+document_status
+Verified/Review/Missing
+confidence_score
+Demo extraction confidence
+field_name
+Compared field
+document_value
+Document-side
+declaration_value
+CusDec-side
+match_status
+Match/Mismatch
+issue_type
+Review reason
+Acceptance Criteria
+Mandatory missing document blocks readiness.
+Mismatch visible at field level.
+Review action audited.
+9. Page 6 – HS Code Intelligence (NEW)
+Purpose
+Compare declared HS code with a controlled demo suggestion derived from sample goods-description mappings.
+Impact on the Current CORE Engine
+Creates a classification-review queue and a transparent signal that can affect risk/review status.
+Top KPI Cards
+Heading
+Definition / Value
+Action
+Declarations Checked
+Compared records
+Open
+HS Matches
+Match count
+Filter
+Possible Mismatches
+Mismatch count
+Filter
+Low Confidence
+Below threshold
+Filter
+Review Pending
+Unresolved
+Filter
+Required Visuals
+Visual Heading
+Type
+Purpose
+Data / Axes
+Match vs Mismatch
+Donut
+Comparison result
+status, count
+Mismatches by HS Chapter
+Bar
+Concentration
+chapter, count
+Confidence Bands
+Bar
+Confidence distribution
+band, count
+Review Trend
+Line
+Pending/resolved
+date, counts
+Main Table – Exact Headings
+Container | CusDec | Goods Description | Declared HS Code | Suggested HS Code | Suggested Description | Confidence | Match Status | Risk Impact | Review Status
+Required User Actions
+Search by goods/HS.
+Accept Declared / Accept Suggested / Escalate.
+Store reviewer and note.
+Send high-impact unresolved mismatch to Recommendation Center.
+Demo / Business Logic
+Use controlled lookup/mapping data for demo; do not claim production classifier.
+Suggested code must be traceable to mapping.
+Do not invent revenue impact unless a sample duty-rate table is explicitly defined.
+Required Data Fields
+Field
+Use
+goods_description
+Input
+declared_hs_code
+Declared
+suggested_hs_code
+Demo suggestion
+suggested_description
+Reference
+classification_confidence
+Demo confidence
+classification_status
+Match/Mismatch
+review_decision
+Human decision
+review_note
+Audit note
+Acceptance Criteria
+Declared and suggested always shown together.
+Decision persists.
+No unsupported revenue claim.
+10. Page 7 – Enhanced Readiness Validation (UPGRADE)
+Purpose
+Make readiness the formal gate combining existing arrival, duty payment, documents and permits with unresolved intelligence-review state.
+Impact on the Current CORE Engine
+Prevents unavailable or unresolved work from consuming officers, bays and scanners.
+Top KPI Cards
+Heading
+Definition / Value
+Action
+Ready
+All mandatory checks pass
+Filter
+Ready – Review Required
+Operationally ready, review unresolved
+Filter
+Blocked
+Mandatory failure
+Filter
+Payment Pending
+Duty/tax incomplete
+Filter
+Document/Permit Pending
+Missing/failed
+Filter
+Required Visuals
+Visual Heading
+Type
+Purpose
+Data / Axes
+Readiness Status
+Donut
+Ready/Review/Blocked
+status, count
+Blocking Reasons
+Bar
+Top blockers
+reason, count
+Readiness Funnel
+Funnel
+Arrived→Paid→Docs→Permit→Review→Ready
+stage, count
+Time to Ready
+Line
+Average hours
+date, avg_hours
+Main Table – Exact Headings
+Container | Arrived | Duty Paid | Documents | Permit | Risk Complete | Anomaly Review | HS Review | Overall Status | Block / Review Reason | Action
+Required User Actions
+Open grouped checklist.
+Revalidate.
+Human-clear Review Required if configured.
+Blocked reason must be explicit.
+Demo / Business Logic
+Existing four checks remain the core mandatory demo gate.
+Status precedence: mandatory failure = Blocked; unresolved intelligence review = Review Required; otherwise Ready.
+Only Ready enters optimizer by default.
+Required Data Fields
+Field
+Use
+arrival_verified
+Operational
+duty_paid
+Financial
+documents_verified
+Document
+permit_approved
+Permit
+anomaly_review_status
+Review
+hs_review_status
+Review
+readiness_status
+Final gate
+readiness_reason
+Explanation
+Acceptance Criteria
+Blocked never scheduled.
+Reason visible.
+Revalidation updates eligibility.
+11. Page 8 – Examination Schedule & Optimizer (UPGRADE)
+Purpose
+Keep the current conflict-free priority slot allocation, but show why each container received its priority.
+Impact on the Current CORE Engine
+This is the execution layer: intelligence decides what deserves attention; CORE decides when and with which resources.
+Top KPI Cards
+Heading
+Definition / Value
+Action
+Ready Queue
+Eligible unscheduled
+Open
+Scheduled Today
+Today's count
+Open
+Critical Scheduled
+Critical today
+Filter
+Overflow
+Future-day rollover
+Open
+Capacity Used
+Used / available minutes
+Open
+Required Visuals
+Visual Heading
+Type
+Purpose
+Data / Axes
+Daily Timeline
+Timeline/Gantt
+Officer/bay assignments
+time, officer, bay, container
+Capacity Utilization
+Gauge
+Used minutes
+used, available
+Scheduled by Risk
+Stacked Bar
+Risk mix
+date/time, risk
+Overflow by Day
+Bar
+Future backlog
+date, count
+Main Table – Exact Headings
+Priority | Container | Risk | Anomaly Alerts | Document Issues | Inspection Type | Duration | Ready Since | Recommended Action | Status
+Required User Actions
+Preview optimizer before commit.
+Click item → priority evidence.
+Manual reschedule only with conflict checks.
+Show overlap/conflict warning.
+Demo / Business Logic
+Keep configurable 08:00–17:00 hours and inspection durations.
+Resources locked for full duration.
+If combined priority score is added, formula must be documented and risk contribution visible.
+Required Data Fields
+Field
+Use
+inspection_priority_score
+Ordering
+priority_reason
+Explainability
+duration_minutes
+Slot length
+officer_id
+Officer
+bay_id
+Bay
+scanner_id
+Scanner
+start_time
+Start
+end_time
+End
+Acceptance Criteria
+No double booking.
+Only eligible work scheduled.
+Priority reason visible.
+12. Page 9 – Examination Outcome & Feedback (NEW)
+Purpose
+Capture physical examination results and link them back to the original risk/recommendation.
+Impact on the Current CORE Engine
+Closes the loop and provides future importer compliance context plus targeting-performance analytics.
+Top KPI Cards
+Heading
+Definition / Value
+Action
+Completed Today
+Completed count
+Open
+Violations Found
+Violation outcomes
+Filter
+No Issue Found
+Clear outcomes
+Filter
+Pending Outcome
+Missing final result
+Filter
+High-Risk Hit Rate
+High/Critical with violation ÷ completed high-risk
+Open
+Required Visuals
+Visual Heading
+Type
+Purpose
+Data / Axes
+Outcome Distribution
+Donut
+Violation/No Issue/Pending
+outcome, count
+Outcome by Risk
+Stacked Bar
+Result vs risk
+risk, outcome
+Top Violation Types
+Bar
+Sample violation categories
+type, count
+Risk vs Outcome
+Bar
+Hit rate by band
+risk, hit_rate
+Main Table – Exact Headings
+Container | CusDec | Date | Officer | Risk | Recommended Action | Examination Type | Outcome | Violation Type | Notes | Evidence Ref | Completed Time
+Required User Actions
+Record outcome from scheduled inspection.
+Require outcome before full completion.
+Link outcome to recommendation.
+Update demo importer history through an auditable event.
+Demo / Business Logic
+Use sample violation categories.
+No Issue must be retained for false-positive analysis.
+History update must be traceable.
+Required Data Fields
+Field
+Use
+outcome_type
+Violation/No Issue/Pending
+violation_type
+Sample category
+officer_notes
+Human result
+evidence_reference
+Optional
+completed_at
+Timestamp
+recommendation_id
+Traceback
+Acceptance Criteria
+Completed inspection has outcome.
+Outcome traceable to recommendation.
+History update audited.
+13. Page 10 – Scenario Simulator (UPGRADE)
+Purpose
+Extend current officer/bay/scanner disruption simulation with cargo-volume and high-risk-volume scenarios.
+Impact on the Current CORE Engine
+Supports capacity planning without changing the live/demo schedule.
+Top KPI Cards
+Heading
+Definition / Value
+Action
+Current Capacity
+Baseline capacity
+None
+Simulated Demand
+Scenario workload
+None
+Overflow
+Same-day unscheduled
+Open
+Completion Days
+Days needed
+None
+Peak Utilization
+Highest resource utilization
+Open
+Required Visuals
+Visual Heading
+Type
+Purpose
+Data / Axes
+Demand vs Capacity
+Combo
+Workload vs capacity
+date, demand, capacity
+Resource Utilization
+Bar
+Officer/Bay/Scanner
+resource, pct
+Overflow Projection
+Line
+Backlog over days
+date, backlog
+Scenario Comparison
+Bar
+Baseline vs scenario
+scenario, metric
+Main Table – Exact Headings
+Scenario | Changed Input | Baseline | Simulated | Difference | Operational Impact | Recommended Action
+Required User Actions
+Inputs: Officer Shortage, Bay Closure, Scanner Failure, Cargo +%, High-Risk +%, Working Hours.
+Run without persisting changes.
+Reset baseline.
+Show calculation basis.
+Demo / Business Logic
+Reuse optimizer on copied/in-memory data.
+Call rules-based result simulation, not prediction.
+Recommendation tied to capacity minutes/overflow.
+Required Data Fields
+Field
+Use
+scenario_type
+Type
+parameter_value
+Change
+baseline_capacity
+Baseline
+simulated_capacity
+Result
+overflow_count
+Backlog
+completion_days
+Days
+recommendation_text
+Suggestion
+Acceptance Criteria
+No live changes.
+Baseline comparison shown.
+Recommendation measurable.
+14. Page 11 – Data Quality & AI Readiness (NEW)
+Purpose
+Show whether data is complete, valid, consistent and usable by intelligence modules.
+Impact on the Current CORE Engine
+Demonstrates that reliable AI/analytics depends on reliable integrated data.
+Top KPI Cards
+Heading
+Definition / Value
+Action
+Completeness Score
+Mandatory fields populated %
+Open
+Valid Records
+Validation pass
+Filter
+Duplicates
+Potential duplicates
+Filter
+Missing HS Codes
+Count
+Filter
+AI-Ready Records
+Pass defined readiness rules
+Filter
+Required Visuals
+Visual Heading
+Type
+Purpose
+Data / Axes
+Quality Scorecard
+Gauge/Cards
+Completeness/Validity/Consistency/Timeliness
+dimension, score
+Issues by Type
+Bar
+Missing/Invalid/Duplicate/Inconsistent
+type, count
+Quality Trend
+Line
+Score over time
+date, score
+Issues by Source
+Bar
+Container/Document/Importer/Resource
+source, count
+Main Table – Exact Headings
+Issue ID | Source | Record ID | Field | Issue Type | Current Value | Expected Rule | Severity | Status | Owner
+Required User Actions
+Open source record.
+Resolve or Ignore with Reason.
+Recalculate AI-ready flag.
+Show validation rule.
+Demo / Business Logic
+Deterministic rules: required IDs, valid HS format, country present, CIF non-negative, importer present, no unresolved critical duplicate.
+Do not invent external standards not supplied.
+Required Data Fields
+Field
+Use
+source_entity
+Dataset
+field_name
+Field
+issue_type
+Problem
+severity
+Priority
+validation_rule
+Rule
+resolution_status
+State
+ai_ready_flag
+Eligibility
+Acceptance Criteria
+Scores derive from rules.
+Issue links to record.
+Resolution changes count.
+15. Page 12 – AI Governance & Audit (NEW)
+Purpose
+Provide end-to-end traceability of system recommendation, evidence, human review, override and final examination outcome.
+Impact on the Current CORE Engine
+Extends the current audit logging into an explainable human-supervised AI/decision-support audit trail.
+Top KPI Cards
+Heading
+Definition / Value
+Action
+Decisions Logged
+Recommendation events
+Open
+Accepted
+Accepted
+Filter
+Overridden
+Overridden
+Filter
+Pending Review
+No decision
+Filter
+Average Review Time
+Generated-to-reviewed
+None
+Required Visuals
+Visual Heading
+Type
+Purpose
+Data / Axes
+Human Decision Split
+Donut
+Accepted/Overridden/Pending
+decision, count
+Overrides by Reason
+Bar
+Why humans override
+reason, count
+Review Time Trend
+Line
+Review duration
+date, minutes
+By Source Module
+Bar
+Risk/Fraud/Document/HS/Capacity
+module, count
+Main Table – Exact Headings
+Timestamp | Recommendation ID | Container | Source Module | System Recommendation | Reasons | Confidence | Reviewer | Human Decision | Override Reason | Final Outcome
+Required User Actions
+Open immutable event detail.
+Filter by container/reviewer/date/module.
+Export audit report.
+Corrections create a new event, not edit history.
+Demo / Business Logic
+Store recommendation, review and outcome as separate events.
+Store rule/model version even for demo rules.
+Record actor and timestamp.
+Required Data Fields
+Field
+Use
+event_id
+Audit key
+event_type
+Recommendation/Review/Outcome
+source_module
+Origin
+rule_model_version
+Version
+reason_snapshot
+Evidence snapshot
+actor
+Human/system
+decision
+Decision
+created_at
+Time
+Acceptance Criteria
+Every recommendation traceable.
+Override reason mandatory.
+History not silently overwritten.
+16. Existing Pages – Required Minor Changes
+Page
+Change
+Container Management
+Add tabs: Overview, Risk, Anomalies, Documents, HS Review, Readiness, Schedule, Outcome, Audit.
+Resource Management
+Retain officer/bay/scanner management; expose qualification, status, assigned minutes and utilization.
+Reports & Analytics
+Add AI Targeting, Anomaly, Document Review, HS Review, Outcome and AI Audit reports.
+System Settings
+Add demo thresholds for risk bands, anomaly rules, confidence bands, review rules and optional priority weights.
+17. Shared Container Detail Drawer
+Tab
+Content
+Overview
+Container, CusDec, importer, goods, HS, country, CIF, status.
+Risk
+Score, level, factor breakdown, action.
+Anomalies
+Alerts, evidence, disposition.
+Documents
+Required docs and field comparisons.
+HS Review
+Declared vs suggested and decision.
+Readiness
+All gate checks and reason.
+Schedule
+Officer/bay/scanner/date/time.
+Outcome
+Inspection result.
+Audit
+Full event timeline.
+18. Database Additions
+Table
+Minimum Fields
+documents
+id, container_id, document_type, status, confidence_score, created_at
+document_field_checks
+id, document_id, field_name, document_value, declaration_value, match_status, issue_type
+anomaly_alerts
+id, container_id, anomaly_type, observed_value, reference_value, variance_pct, severity, rule_code, reason_text, disposition
+hs_reviews
+id, container_id, declared_hs_code, suggested_hs_code, suggested_description, confidence, match_status, review_decision, review_note
+recommendations
+id, container_id, source_module, type, severity, recommended_action, reason_text, confidence, status, created_at
+recommendation_reviews
+id, recommendation_id, reviewer, decision, override_reason, note, reviewed_at
+inspection_outcomes
+id, schedule_id, container_id, outcome_type, violation_type, officer_notes, completed_at
+data_quality_issues
+id, source_entity, record_id, field_name, issue_type, severity, validation_rule, status
+audit_events
+id, container_id, event_type, source_module, rule_model_version, payload_snapshot, actor, created_at
+19. Backend API Groups
+Route Group
+Responsibility
+/risk
+Calculate and explain risk.
+/anomalies
+Run demo anomaly rules and dispositions.
+/documents
+Document checks and reviews.
+/hs-intelligence
+Controlled HS suggestion and review.
+/readiness
+Final eligibility gate.
+/recommendations
+Create/review/override recommendations.
+/optimizer
+Preview/run scheduling.
+/outcomes
+Examination results.
+/scenarios
+Non-persistent what-if simulation.
+/data-quality
+Validation and issue register.
+/audit
+Immutable event history.
+20. Recommended Frontend Files
+pages/  AIRecommendationCenter.jsx  AIRiskIntelligence.jsx  FraudAnomalyDetection.jsx  DocumentIntelligence.jsx  HSCodeIntelligence.jsx  ReadinessValidation.jsx  ExaminationSchedule.jsx  ExaminationOutcome.jsx  ScenarioSimulator.jsx  DataQualityAIReadiness.jsx  AIGovernanceAudit.jsxcomponents/  ContainerIntelligenceDrawer.jsx  RiskScoreCard.jsx  RiskBreakdown.jsx  RecommendationCard.jsx  EvidencePanel.jsx  DocumentComparisonTable.jsx  HSCodeComparison.jsx  ReadinessChecklist.jsx  StatusBadge.jsx  AuditTimeline.jsx  CapacityGauge.jsx  FilterBar.jsx
+21. Demo Data Requirements
+Entity
+Recommended Volume
+Containers
+80–150
+Importers
+20–30
+HS Codes
+15–25 controlled codes
+Countries
+8–12
+Officers
+10–15
+Bays
+4–6
+Scanners
+1–3
+Documents
+3–5 per container
+Anomaly Alerts
+20–40
+Recommendations
+25–50
+Completed Outcomes
+30–60
+Create one hero container used through the entire demo.
+Hero container: high risk + CIF anomaly + HS/document mismatch + later resolved readiness + scanner requirement + scheduled inspection + outcome.
+Also create a clean low-risk container, a high-risk blocked container, a medium-risk document-review container and an overflow container.
+22. Exact Demo Walkthrough
+Open Operations Dashboard and select the hero Critical/High container.
+Open Recommendation Center and show its recommendation/evidence.
+Open AI Risk Intelligence and explain the factor breakdown.
+Open Fraud & Anomaly Detection and show the CIF/pattern alert.
+Open Document Intelligence and show a field mismatch.
+Open HS Code Intelligence and show declared vs suggested classification.
+Open Enhanced Readiness, complete/review the outstanding item and reach Ready.
+Open Examination Schedule, preview/run optimizer and show officer, bay, scanner, date and time.
+Open Examination Outcome and record the result.
+Open AI Governance & Audit and show recommendation → human review → schedule → outcome.
+Optionally simulate an officer/scanner shortage.
+Return to Dashboard/Reports and show updated status.
+23. Implementation Phases
+Phase
+Work
+Output
+1 – Foundation
+Shared statuses, DB additions, sample data, Container Detail
+Stable data model
+2 – Intelligence
+Risk, Anomaly, Document, HS pages
+Explainable targeting
+3 – Decision Gate
+Recommendation Center + Readiness
+Human-supervised workflow
+4 – Execution
+Schedule integration + Outcome
+End-to-end operations
+5 – Management
+Scenario + Data Quality + Audit
+Management/governance
+6 – Polish
+Dashboard, reports, filters, reset, responsive UI
+Presentation-ready demo
+24. Definition of Done
+All pages use the same database and container IDs.
+No KPI/visual value is unrelated to underlying records or explicit demo rules.
+Every risk/anomaly/recommendation is explainable.
+Human accept/override actions persist and are audited.
+Blocked containers cannot be scheduled.
+Officer, bay and scanner conflicts are prevented.
+Scenario simulation does not modify the operational schedule.
+Outcome links back to the original recommendation.
+Filters and drill-through work.
+System recommendation and human decision are visibly different.
+All simulated data/confidence values are treated as sample/demo.
+Demo can be reset to a known starting state.
+25. Final Instruction to the Junior Developer
+Do not rebuild CORE Engine as a separate application. Extend the current workflow. Intelligence modules create evidence and recommendations; Readiness controls eligibility; the existing optimizer turns eligible priority into a resource-feasible schedule; officers record outcomes; governance and analytics expose the complete decision chain.
+If a feature requires real Sri Lanka Customs data, a production OCR model, a production HS-classification model, or an official legal/business rule that has not been supplied, implement the workflow with clearly marked synthetic/demo data and configurable rules. Do not invent an official Customs rule.

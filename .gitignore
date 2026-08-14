@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+ENV/
+env/
+
+# Builds
+dist/
+build/
+
+# Python cache & databases
+__pycache__/
+*.py[cod]
+*$py.class
+*.db
+*.sqlite3
+
+# Logs & temp
+*.log
+.DS_Store
+Thumbs.db
+.gemini/
